@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:meeting_app/bloc/meeting/meeting_bloc.dart';
 import 'package:meeting_app/data_model/common.dart';
+import 'package:meeting_app/data_model/meeting.dart';
 import 'package:meeting_app/ui/components/date_picker.dart';
 import 'package:meeting_app/ui/components/picker.dart';
 
@@ -17,25 +20,22 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
   DateFormat format = DateFormat('dd MMM, hh:mm aa');
   DateTime fromDateTime;
   DateTime endDateTime;
+  String title;
+  String description;
 
   // endTime ( default current time + 30 minutes )
   CommonData room;
   CommonData priority;
   GlobalKey<FormState> formKey = GlobalKey();
 
+  int _defaultDuration = 30;
+
   @override
   void initState() {
     super.initState();
-    int minutes = DateTime.now().minute;
-    int mod = minutes % 30;
-    fromDateTime = DateTime.now().add(
-      Duration(minutes: mod < 4 ? -mod : (30 - mod)),
-    );
-    endDateTime = fromDateTime.add(
-      Duration(
-        minutes: 30,
-      ),
-    );
+
+    /// to setup the initial values
+    initialSetup();
   }
 
   @override
@@ -51,11 +51,22 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
           child: InkWell(
             onTap: () {
               formKey.currentState.save();
+
+              /// This will validate the Title and Description field using the default form
+              /// field validator
               if (formKey.currentState.validate()) {
-                if (room == null) {
-                  final snackBar =
-                      SnackBar(content: Text('Please pick a location!'));
+                /// this will check if priority and location selected
+                /// else shows a SnackBar with error
+                if (room == null || priority == null) {
+                  final snackBar = SnackBar(
+                    content: Text(
+                      'Please pick a ${room == null ? 'Location' : 'Priority'}!',
+                    ),
+                  );
                   ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                } else {
+                  /// if validates save the data to local db
+                  saveMeeting();
                 }
               }
             },
@@ -80,6 +91,9 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
           children: [
             TextFormField(
               textInputAction: TextInputAction.next,
+              onSaved: (value) {
+                title = value;
+              },
               decoration: InputDecoration(
                 icon: Icon(Icons.edit),
                 labelText: 'Title',
@@ -92,6 +106,9 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
               },
             ),
             TextFormField(
+              onSaved: (value) {
+                description = value;
+              },
               decoration: InputDecoration(
                 icon: Icon(Icons.description),
                 labelText: 'Description',
@@ -236,6 +253,44 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// Method to create the meeting object based on the user entered details
+  void saveMeeting() {
+    // creates a [meeting] object
+    Meeting meeting = Meeting(
+      startTime: fromDateTime.millisecondsSinceEpoch,
+      endTime: endDateTime.millisecondsSinceEpoch,
+      title: title,
+      description: description,
+      roomId: room?.id,
+      roomName: room?.name,
+      reminder: 15,
+      priority: priority?.id,
+      duration: fromDateTime.difference(endDateTime).inMinutes,
+    );
+
+    /// adds the CreateMeeting event to MeetingBloc
+    BlocProvider.of<MeetingBloc>(context).add(
+      CreateMeeting(meeting: meeting),
+    );
+  }
+
+  /// this method will create from and too times based on the current time
+  /// the meeting start time will be rounded to the nearby half time
+
+  void initialSetup() {
+    int minutes = DateTime.now().minute;
+
+    int mod = minutes % _defaultDuration;
+    fromDateTime = DateTime.now().add(
+      Duration(minutes: mod < 4 ? -mod : (30 - mod)),
+    );
+    endDateTime = fromDateTime.add(
+      Duration(
+        minutes: 30,
       ),
     );
   }

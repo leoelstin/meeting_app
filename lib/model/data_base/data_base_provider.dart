@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -31,7 +32,15 @@ class DatabaseProvider {
   void initDB(Database database, int version) async {
     await database.execute("CREATE TABLE $meetingTable ("
         "id INTEGER PRIMARY KEY, "
+        "title TEXT, "
         "description TEXT, "
+        "room_name TEXT, "
+        "room_id INTEGER, "
+        "priority INTEGER, "
+        "startTime INTEGER, "
+        "duration INTEGER, "
+        "endTime INTEGER, "
+        "reminder INTEGER, "
         "is_done INTEGER "
         ")");
   }

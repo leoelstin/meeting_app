@@ -20,7 +20,7 @@ class Meeting {
     this.reminder,
   });
 
-  String id;
+  int id;
   int startTime;
   int endTime;
   String title;
