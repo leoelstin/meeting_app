@@ -1,10 +1,28 @@
 import 'dart:async';
 
 import 'package:meeting_app/data_model/meeting.dart';
+import 'package:meeting_app/data_model/common.dart';
 import 'package:meeting_app/model/data_base/data_base_provider.dart';
 
 class MeetingsRepository {
   final dbProvider = DatabaseProvider.dbProvider;
+
+  List<CommonData> rooms() {
+    return [
+      CommonData(id: 0, name: 'Main Meeting Room'),
+      CommonData(id: 1, name: 'CH1 Meeting Room'),
+      CommonData(id: 2, name: 'CH2 Meeting Room'),
+      CommonData(id: 3, name: 'CH3 Mini Room'),
+    ];
+  }
+
+  List<CommonData> priorities() {
+    return [
+      CommonData(id: 0, name: 'Low'),
+      CommonData(id: 1, name: 'Medium'),
+      CommonData(id: 2, name: 'High'),
+    ];
+  }
 
   //add a new meeting to db
   Future<int> createTodo(Meeting meeting) async {
