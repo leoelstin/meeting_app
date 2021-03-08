@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:meeting_app/bloc/meeting/meeting_bloc.dart';
+import 'package:meeting_app/bloc/room/room_bloc.dart';
 import 'package:meeting_app/data_model/common.dart';
 import 'package:meeting_app/data_model/meeting.dart';
 import 'package:meeting_app/ui/components/date_picker.dart';
 import 'package:meeting_app/ui/components/picker.dart';
+import 'package:meeting_app/ui/components/rooms_picker.dart';
 
 class MeetingPlanner extends StatefulWidget {
   static const meetingPlanner = '/meetingPlanner';
@@ -235,14 +237,7 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
               onTap: !edit
                   ? null
                   : () {
-                      Picker(
-                        onSelected: (value) {
-                          setState(() {
-                            room = value;
-                          });
-                        },
-                        type: PickerType.LOCATION,
-                      ).show(context);
+                      openRoomPicker(context);
                     },
               child: Row(
                 children: [
@@ -371,6 +366,21 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
         saveMeeting();
       }
     }
+  }
+
+  void openRoomPicker(BuildContext context) {
+    /// adds the fetch room event
+    BlocProvider.of<RoomBloc>(context).add(
+      FetchRoom(start: fromDateTime),
+    );
+    // open the room picker
+    RoomPicker(
+      onSelected: (value) {
+        setState(() {
+          room = value;
+        });
+      },
+    ).show(context);
   }
 }
 

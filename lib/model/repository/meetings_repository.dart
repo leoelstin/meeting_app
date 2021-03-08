@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:meeting_app/data_model/meeting.dart';
 import 'package:meeting_app/data_model/common.dart';
+import 'package:meeting_app/data_model/meeting.dart';
 import 'package:meeting_app/model/data_base/data_base_provider.dart';
 
 class MeetingsRepository {
@@ -24,6 +24,34 @@ class MeetingsRepository {
     ];
   }
 
+  Future getRooms({DateTime start, DateTime end}) async {
+    List<Meeting> meetings = await getAllMeetings();
+    meetings.where(
+      (element) {
+        return (!start.isAtSameMomentAs(
+                    DateTime.fromMillisecondsSinceEpoch(element.startTime)) ||
+                !start.isAfter(
+                    DateTime.fromMillisecondsSinceEpoch(element.startTime))) &&
+            !start
+                .isBefore(DateTime.fromMillisecondsSinceEpoch(element.endTime));
+      },
+    );
+
+    Set<int> bookedRooms = meetings.map((e) => e.roomId).toSet();
+    List<CommonData> roomList = [];
+    rooms().forEach((element) {
+      roomList.add(
+        CommonData(
+          id: element.id,
+          name: element.name,
+          isAvailable: !bookedRooms.contains(element?.id),
+        ),
+      );
+    });
+
+    return roomList;
+  }
+
   //add a new meeting to db
   Future<int> createTodo(Meeting meeting) async {
     final db = await dbProvider.database;
@@ -36,10 +64,8 @@ class MeetingsRepository {
     final db = await dbProvider.database;
 
     List<Map<String, dynamic>> result;
-
-    result = await db.query(
-      meetingTable,
-    );
+    int currentMilli = DateTime.now().millisecondsSinceEpoch;
+    result = await db.query(meetingTable, where: 'startTime >= $currentMilli');
 
     List<Meeting> meetings = result.isNotEmpty
         ? result.map((item) => Meeting.fromJson(item)).toList()
