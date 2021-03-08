@@ -64,6 +64,8 @@ class __LocationWidgetState extends State<_LocationWidget> {
                 itemBuilder: (context, index) {
                   CommonData data = list[index];
                   return ListTile(
+                    enabled: data.isAvailable,
+                    subtitle: !data.isAvailable ? Text('Booked') : null,
                     onTap: () {
                       widget?.onSelected(data);
                       Navigator.pop(context);

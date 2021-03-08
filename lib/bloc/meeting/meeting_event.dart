@@ -15,4 +15,8 @@ class UpdateMeeting extends MeetingEvent {
   UpdateMeeting({this.meeting});
 }
 
-class LoadMeeting extends MeetingEvent {}
+class LoadMeeting extends MeetingEvent {
+  final DateTime dateTime;
+
+  LoadMeeting([this.dateTime]);
+}

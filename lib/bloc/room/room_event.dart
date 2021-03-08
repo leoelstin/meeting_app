@@ -8,3 +8,9 @@ class FetchRoom extends RoomEvent {
 
   FetchRoom({this.start});
 }
+
+class UpdateRoom extends RoomEvent {
+  final CommonData room;
+
+  UpdateRoom({this.room});
+}

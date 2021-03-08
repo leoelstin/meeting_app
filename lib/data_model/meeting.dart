@@ -28,11 +28,12 @@ class Meeting {
   String description;
   int duration;
   String roomName;
+  String roomColor;
   int roomId;
   int priority;
   int reminder;
 
-  CommonData get room => CommonData(name: roomName, id: roomId);
+  CommonData get room => CommonData(name: roomName, id: roomId, color: roomColor);
 
   CommonData get priorityData => CommonData(name: priorityName(), id: priority);
 

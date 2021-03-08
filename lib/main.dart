@@ -15,13 +15,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider<RoomBloc>(
-          create: (context) => RoomBloc(),
-        ),
         BlocProvider<MeetingBloc>(
           create: (context) {
             return MeetingBloc();
           },
+        ),
+        BlocProvider<RoomBloc>(
+          create: (context) => RoomBloc(meetingBloc: MeetingBloc()),
         ),
       ],
       child: MaterialApp(

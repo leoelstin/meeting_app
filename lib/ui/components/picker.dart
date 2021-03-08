@@ -45,7 +45,6 @@ class __LocationWidgetState extends State<_LocationWidget> {
   void initState() {
     super.initState();
     if (widget?.type == PickerType.LOCATION) {
-      list = MeetingsRepository().rooms();
     } else {
       list = MeetingsRepository().priorities();
     }

@@ -4,6 +4,7 @@ part of 'room_bloc.dart';
 abstract class RoomState {}
 
 class RoomInitial extends RoomState {}
+class RoomUpdated extends RoomState {}
 
 class RoomsLoaded extends RoomState {
   final List<CommonData> rooms;

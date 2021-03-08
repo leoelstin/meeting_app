@@ -5,6 +5,7 @@ import 'package:meeting_app/bloc/meeting/meeting_bloc.dart';
 import 'package:meeting_app/bloc/room/room_bloc.dart';
 import 'package:meeting_app/data_model/common.dart';
 import 'package:meeting_app/data_model/meeting.dart';
+import 'package:meeting_app/model/repository/office_hours.dart';
 import 'package:meeting_app/ui/components/date_picker.dart';
 import 'package:meeting_app/ui/components/picker.dart';
 import 'package:meeting_app/ui/components/rooms_picker.dart';
@@ -190,6 +191,9 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
                               onDateTimeChanged: (value) {
                                 setState(() {
                                   fromDateTime = value;
+                                  endDateTime =
+                                      fromDateTime.add(Duration(minutes: 30));
+                                  room = null;
                                 });
                               },
                             ).show();
@@ -215,6 +219,7 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
                               onDateTimeChanged: (value) {
                                 setState(() {
                                   endDateTime = value;
+                                  room = null;
                                 });
                               },
                             ).show();
@@ -306,8 +311,8 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
       // if update send the meeting id
       id: update ? plannerData?.meeting?.id : null,
 
-      startTime: fromDateTime.millisecondsSinceEpoch,
-      endTime: endDateTime.millisecondsSinceEpoch,
+      startTime: fromDateTime.toUtc().millisecondsSinceEpoch,
+      endTime: endDateTime.toUtc().millisecondsSinceEpoch,
       title: title,
       description: description,
       roomId: room?.id,
@@ -327,6 +332,8 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
         UpdateMeeting(meeting: meeting),
       );
     }
+
+    Navigator.pop(context);
   }
 
   /// this method will create from and too times based on the current time
@@ -337,7 +344,7 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
 
     int mod = minutes % _defaultDuration;
     fromDateTime = DateTime.now().add(
-      Duration(minutes: mod < 4 ? -mod : (30 - mod)),
+      Duration(minutes: mod < 8 ? -mod : (_defaultDuration - mod)),
     );
     endDateTime = fromDateTime.add(
       Duration(
@@ -354,6 +361,30 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
     if (formKey.currentState.validate()) {
       /// this will check if priority and location selected
       /// else shows a SnackBar with error
+      if (fromDateTime.isBefore(DateTime.now())) {
+        final snackBar = SnackBar(
+          content: Text(
+            'Meeting start time is in the past!',
+          ),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        return;
+      }
+
+      DateTime tempFrom = DateTime(fromDateTime.year, fromDateTime.month,
+          fromDateTime.day, OfficeRepository.startHour, OfficeRepository.startMin);
+      DateTime tempEnd = DateTime(endDateTime.year, endDateTime.month,
+          endDateTime.day, OfficeRepository.endHour, OfficeRepository.endMin);
+
+      if (fromDateTime.isBefore(tempFrom) || endDateTime.isAfter(tempEnd)) {
+        final snackBar = SnackBar(
+          content: Text(
+            'Meeting time is not within office hour',
+          ),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        return;
+      }
       if (room == null || priority == null) {
         final snackBar = SnackBar(
           content: Text(

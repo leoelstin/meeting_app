@@ -5,14 +5,17 @@ class DatePicker {
   BuildContext context;
   final ValueChanged<DateTime> onDateTimeChanged;
   final DateTime initialDate;
+  final CupertinoDatePickerMode mode;
 
   DatePicker(
     this.context, {
     @required this.onDateTimeChanged,
     @required this.initialDate,
+    this.mode = CupertinoDatePickerMode.dateAndTime,
   });
 
   void show() {
+    DateTime time = initialDate;
     showCupertinoModalPopup(
         context: context,
         builder: (context) {
@@ -22,11 +25,13 @@ class DatePicker {
             child: Stack(
               children: <Widget>[
                 CupertinoDatePicker(
-                  mode: CupertinoDatePickerMode.dateAndTime,
+                  mode: mode,
                   onDateTimeChanged: (date) {
-                    onDateTimeChanged(date);
+                    time = date;
+                    // onDateTimeChanged(date);
                   },
-                  initialDateTime: initialDate,
+                  initialDateTime:
+                      initialDate.isBefore(DateTime.now()) ? null : initialDate,
                   minimumDate: DateTime.now(),
                   maximumDate: DateTime(DateTime.now().year + 3),
                 ),
@@ -34,7 +39,10 @@ class DatePicker {
                   alignment: Alignment.topRight,
                   child: CupertinoButton(
                     child: Text('Done'),
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () => {
+                      onDateTimeChanged(time),
+                      Navigator.pop(context),
+                    },
                   ),
                 ),
               ],

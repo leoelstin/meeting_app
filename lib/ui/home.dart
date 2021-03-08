@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:meeting_app/ui/components/text.dart';
 import 'package:meeting_app/ui/meeting_planner.dart';
+import 'package:meeting_app/ui/settings/settings.dart';
 
 import 'components/meetings_list.dart';
 
@@ -19,15 +20,24 @@ class Home extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.add),
+            icon: Icon(Icons.settings),
             onPressed: () {
               Navigator.pushNamed(
                 context,
-                MeetingPlanner.meetingPlanner,
+                Settings.route,
               );
             },
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pushNamed(
+            context,
+            MeetingPlanner.meetingPlanner,
+          );
+        },
+        child: Icon(Icons.add),
       ),
       body: MeetingsList(),
     );

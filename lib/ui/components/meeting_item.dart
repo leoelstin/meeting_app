@@ -59,10 +59,7 @@ class MeetingItem extends StatelessWidget {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
+                  padding: const EdgeInsets.only(left: 8, top: 4, bottom: 4),
                   child: Row(
                     children: [
                       Text(
@@ -74,20 +71,39 @@ class MeetingItem extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                       Spacer(),
-                      Icon(
-                        CupertinoIcons.location,
-                        size: 12,
-                      ),
-                      SizedBox(
-                        width: 4,
-                      ),
-                      Text(
-                        '${meeting?.roomName ?? ''}',
-                        style: TextStyle(
-                          fontSize: 12,
+
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Color(
+                            int.tryParse(meeting.roomColor),
+                          ),
+                          borderRadius: BorderRadius.circular(8)
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 8,
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              CupertinoIcons.location,
+                              size: 12,
+                              color: Colors.white,
+                            ),
+                            SizedBox(
+                              width: 4,
+                            ),
+                            Text(
+                              '${meeting?.roomName ?? ''}',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.white,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -96,12 +112,7 @@ class MeetingItem extends StatelessWidget {
                   children: [
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.lightGreen,
                         borderRadius: BorderRadius.circular(8),
-                      ),
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
                       ),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,
@@ -112,7 +123,7 @@ class MeetingItem extends StatelessWidget {
                         children: [
                           Icon(
                             CupertinoIcons.arrow_up_right_circle,
-                            size: 13,
+                            size: 15,
                           ),
                           SizedBox(
                             width: 4,
@@ -120,7 +131,7 @@ class MeetingItem extends StatelessWidget {
                           Text(
                             '${meeting?.priorityName() ?? ''}',
                             style: TextStyle(
-                              fontSize: 13,
+                              fontSize: 15,
                             ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,

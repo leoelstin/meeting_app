@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
 final meetingTable = 'meetings';
+final roomsTable = 'rooms';
 
 class DatabaseProvider {
   static final DatabaseProvider dbProvider = DatabaseProvider();
@@ -21,12 +22,14 @@ class DatabaseProvider {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentsDirectory.path, "meeting_app.db");
     var database = await openDatabase(path,
-        version: 1, onCreate: initDB, onUpgrade: onUpgrade);
+        version: 2, onCreate: initDB, onUpgrade: onUpgrade);
     return database;
   }
 
   void onUpgrade(Database database, int oldVersion, int newVersion) {
-    if (newVersion > oldVersion) {}
+    if (newVersion > oldVersion) {
+
+    }
   }
 
   void initDB(Database database, int version) async {
@@ -43,5 +46,13 @@ class DatabaseProvider {
         "reminder INTEGER, "
         "is_done INTEGER "
         ")");
+
+    await database.execute("CREATE TABLE $roomsTable ("
+        "id INTEGER PRIMARY KEY, "
+        "name TEXT, "
+        "color TEXT, "
+        "isAvailable INTEGER "
+        ")");
+
   }
 }
