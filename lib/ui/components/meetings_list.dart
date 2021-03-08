@@ -54,6 +54,7 @@ class _MeetingsListState extends State<MeetingsList> {
                   onPressed: () {
                     DatePicker(
                       context,
+                      minimumDate: DateTime.now(),
                       onDateTimeChanged: (value) {
                         setState(() {
                           dateTime = value;

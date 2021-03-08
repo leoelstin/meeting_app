@@ -187,6 +187,7 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
                         : () {
                             DatePicker(
                               context,
+                              minimumDate: DateTime.now(),
                               initialDate: fromDateTime,
                               onDateTimeChanged: (value) {
                                 setState(() {
@@ -215,6 +216,7 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
                         : () {
                             DatePicker(
                               context,
+                              minimumDate: DateTime.now(),
                               initialDate: endDateTime,
                               onDateTimeChanged: (value) {
                                 setState(() {

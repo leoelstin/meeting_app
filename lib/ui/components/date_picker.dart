@@ -5,12 +5,14 @@ class DatePicker {
   BuildContext context;
   final ValueChanged<DateTime> onDateTimeChanged;
   final DateTime initialDate;
+  final DateTime minimumDate;
   final CupertinoDatePickerMode mode;
 
   DatePicker(
     this.context, {
+    this.minimumDate,
     @required this.onDateTimeChanged,
-    @required this.initialDate,
+    this.initialDate,
     this.mode = CupertinoDatePickerMode.dateAndTime,
   });
 
@@ -30,9 +32,11 @@ class DatePicker {
                     time = date;
                     // onDateTimeChanged(date);
                   },
-                  initialDateTime:
-                      initialDate.isBefore(DateTime.now()) ? null : initialDate,
-                  minimumDate: DateTime.now(),
+                  initialDateTime: initialDate == null ||
+                          initialDate.isBefore(DateTime.now())
+                      ? null
+                      : initialDate,
+                  minimumDate: minimumDate  ,
                   maximumDate: DateTime(DateTime.now().year + 3),
                 ),
                 Align(
