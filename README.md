@@ -1,16 +1,32 @@
-# meeting_app
+# Meeting App
+Please Note :
 
-A Flutter application to build a meeting planner to manage the meeting room during office hours
+```sh
+Default office time is 9:00 to 5:00
+Default Duration  is 30 Mins
+```
+## Features
 
-## Getting Started
+- BLoc For state management
+- Offline presistant with SqLite
+- Conflict checking when creating new booking
+- Set office hours
+- Update Color / Name of meeting rooms
+- View Created meetings ( based on priority )
 
-This project is a starting point for a Flutter application.
+## Plugins used
 
-A few resources to get you started if this is your first Flutter project:
+The Followinf first party plugins are used
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+| Plugin | README |
+| ------ | ------ |
+| SqFlite | For keeping the data locally|
+| Bloc | For State Management and Bloc Pattern |
+| path_provider | To save the sqLite db in document storage |
+| intl | For Date formating |
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Development
+
+```sh
+ Flutter (Channel stable, 2.0.1, )
+```
