@@ -17,8 +17,3 @@ class MeetingsLoaded extends MeetingState {
   MeetingsLoaded(this.meetings);
 }
 
-class UpdateMeeting extends MeetingState {
-  final Meeting meeting;
-
-  UpdateMeeting(this.meeting);
-}

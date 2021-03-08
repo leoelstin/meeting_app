@@ -15,8 +15,6 @@ class MeetingPlanner extends StatefulWidget {
 }
 
 class _MeetingPlannerState extends State<MeetingPlanner> {
-  // fromTime
-
   DateFormat format = DateFormat('dd MMM, hh:mm aa');
   DateTime fromDateTime;
   DateTime endDateTime;
@@ -29,6 +27,14 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
   GlobalKey<FormState> formKey = GlobalKey();
 
   int _defaultDuration = 30;
+  MeetingPlannerData plannerData = MeetingPlannerData();
+
+  // Controllers
+  TextEditingController titleController = TextEditingController(),
+      descriptionController = TextEditingController();
+
+  bool edit = true;
+  bool update = false;
 
   @override
   void initState() {
@@ -36,60 +42,89 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
 
     /// to setup the initial values
     initialSetup();
+
+    /// waits till the first frame of the UI is visible
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      /// get the data from the modal route
+      plannerData = ModalRoute.of(context).settings.arguments;
+      if (plannerData?.meeting != null) {
+        update = plannerData.update;
+        edit = false;
+        titleController.text = plannerData?.meeting?.title;
+        descriptionController.text = plannerData?.meeting?.description;
+        room = plannerData?.meeting?.room;
+        priority = plannerData?.meeting?.priorityData;
+        fromDateTime = DateTime.fromMillisecondsSinceEpoch(
+            plannerData?.meeting?.startTime);
+        endDateTime = DateTime.fromMillisecondsSinceEpoch(
+          plannerData?.meeting?.endTime,
+        );
+        setState(() {});
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('New Meeting'),
-      ),
-      bottomNavigationBar: BottomAppBar(
-        color: Theme.of(context).primaryColor,
-        elevation: 0,
-        child: SafeArea(
-          child: InkWell(
-            onTap: () {
-              formKey.currentState.save();
-
-              /// This will validate the Title and Description field using the default form
-              /// field validator
-              if (formKey.currentState.validate()) {
-                /// this will check if priority and location selected
-                /// else shows a SnackBar with error
-                if (room == null || priority == null) {
-                  final snackBar = SnackBar(
-                    content: Text(
-                      'Please pick a ${room == null ? 'Location' : 'Priority'}!',
-                    ),
-                  );
-                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                } else {
-                  /// if validates save the data to local db
-                  saveMeeting();
+        title: Text(
+          '${plannerData?.meeting != null ? 'Meeting Details' : 'New Meeting'}',
+        ),
+        actions: [
+          if (update)
+            TextButton(
+              onPressed: () {
+                if (edit) {
+                  validateEntry();
+                  return;
                 }
-              }
-            },
-            child: Container(
-              alignment: Alignment.center,
-              height: kToolbarHeight,
+                setState(() {
+                  edit = !edit;
+                });
+              },
               child: Text(
-                'Create Meeting',
+                '${edit ? 'Save' : 'Edit'}',
                 style: TextStyle(
-                  fontSize: 16,
                   color: Colors.white,
                 ),
               ),
             ),
-          ),
-        ),
+        ],
       ),
+      bottomNavigationBar: update
+          ? null
+          : BottomAppBar(
+              color: Theme.of(context).primaryColor,
+              elevation: 0,
+              child: SafeArea(
+                child: InkWell(
+                  onTap: () {
+                    // validates the data
+                    validateEntry();
+                  },
+                  child: Container(
+                    alignment: Alignment.center,
+                    height: kToolbarHeight,
+                    child: Text(
+                      'Create Meeting',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
       body: Form(
         key: formKey,
         child: ListView(
           padding: EdgeInsets.all(16),
           children: [
             TextFormField(
+              enabled: edit,
+              controller: titleController,
               textInputAction: TextInputAction.next,
               onSaved: (value) {
                 title = value;
@@ -106,6 +141,8 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
               },
             ),
             TextFormField(
+              enabled: edit,
+              controller: descriptionController,
               onSaved: (value) {
                 description = value;
               },
@@ -142,17 +179,19 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   InkWell(
-                    onTap: () {
-                      DatePicker(
-                        context,
-                        initialDate: fromDateTime,
-                        onDateTimeChanged: (value) {
-                          setState(() {
-                            fromDateTime = value;
-                          });
-                        },
-                      ).show();
-                    },
+                    onTap: !edit
+                        ? null
+                        : () {
+                            DatePicker(
+                              context,
+                              initialDate: fromDateTime,
+                              onDateTimeChanged: (value) {
+                                setState(() {
+                                  fromDateTime = value;
+                                });
+                              },
+                            ).show();
+                          },
                     child: Row(
                       children: [
                         Text('Start'),
@@ -165,17 +204,19 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
                     height: 16,
                   ),
                   InkWell(
-                    onTap: () {
-                      DatePicker(
-                        context,
-                        initialDate: endDateTime,
-                        onDateTimeChanged: (value) {
-                          setState(() {
-                            endDateTime = value;
-                          });
-                        },
-                      ).show();
-                    },
+                    onTap: !edit
+                        ? null
+                        : () {
+                            DatePicker(
+                              context,
+                              initialDate: endDateTime,
+                              onDateTimeChanged: (value) {
+                                setState(() {
+                                  endDateTime = value;
+                                });
+                              },
+                            ).show();
+                          },
                     child: Row(
                       children: [
                         Text('End'),
@@ -191,16 +232,18 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
               height: 16,
             ),
             InkWell(
-              onTap: () {
-                Picker(
-                  onSelected: (value) {
-                    setState(() {
-                      room = value;
-                    });
-                  },
-                  type: PickerType.LOCATION,
-                ).show(context);
-              },
+              onTap: !edit
+                  ? null
+                  : () {
+                      Picker(
+                        onSelected: (value) {
+                          setState(() {
+                            room = value;
+                          });
+                        },
+                        type: PickerType.LOCATION,
+                      ).show(context);
+                    },
               child: Row(
                 children: [
                   Icon(Icons.location_on_outlined),
@@ -209,10 +252,11 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
                   ),
                   Text('${room?.name ?? 'Location'}'),
                   Spacer(),
-                  Icon(
-                    Icons.arrow_forward,
-                    size: 14,
-                  ),
+                  if (edit)
+                    Icon(
+                      Icons.arrow_forward,
+                      size: 14,
+                    ),
                   SizedBox(
                     width: 16,
                   )
@@ -223,16 +267,18 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
               height: 16,
             ),
             InkWell(
-              onTap: () {
-                Picker(
-                  onSelected: (value) {
-                    setState(() {
-                      priority = value;
-                    });
-                  },
-                  type: PickerType.PRIORITY,
-                ).show(context);
-              },
+              onTap: !edit
+                  ? null
+                  : () {
+                      Picker(
+                        onSelected: (value) {
+                          setState(() {
+                            priority = value;
+                          });
+                        },
+                        type: PickerType.PRIORITY,
+                      ).show(context);
+                    },
               child: Row(
                 children: [
                   Icon(Icons.priority_high),
@@ -241,10 +287,11 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
                   ),
                   Text('${priority?.name ?? 'Priority'}'),
                   Spacer(),
-                  Icon(
-                    Icons.arrow_forward,
-                    size: 14,
-                  ),
+                  if (edit)
+                    Icon(
+                      Icons.arrow_forward,
+                      size: 14,
+                    ),
                   SizedBox(
                     width: 16,
                   )
@@ -261,6 +308,9 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
   void saveMeeting() {
     // creates a [meeting] object
     Meeting meeting = Meeting(
+      // if update send the meeting id
+      id: update ? plannerData?.meeting?.id : null,
+
       startTime: fromDateTime.millisecondsSinceEpoch,
       endTime: endDateTime.millisecondsSinceEpoch,
       title: title,
@@ -273,9 +323,15 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
     );
 
     /// adds the CreateMeeting event to MeetingBloc
-    BlocProvider.of<MeetingBloc>(context).add(
-      CreateMeeting(meeting: meeting),
-    );
+    if (!update) {
+      BlocProvider.of<MeetingBloc>(context).add(
+        CreateMeeting(meeting: meeting),
+      );
+    } else {
+      BlocProvider.of<MeetingBloc>(context).add(
+        UpdateMeeting(meeting: meeting),
+      );
+    }
   }
 
   /// this method will create from and too times based on the current time
@@ -294,4 +350,33 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
       ),
     );
   }
+
+  void validateEntry() {
+    formKey.currentState.save();
+
+    /// This will validate the Title and Description field using the default form
+    /// field validator
+    if (formKey.currentState.validate()) {
+      /// this will check if priority and location selected
+      /// else shows a SnackBar with error
+      if (room == null || priority == null) {
+        final snackBar = SnackBar(
+          content: Text(
+            'Please pick a ${room == null ? 'Location' : 'Priority'}!',
+          ),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      } else {
+        /// if validates save the data to local db
+        saveMeeting();
+      }
+    }
+  }
+}
+
+class MeetingPlannerData {
+  final bool update;
+  final Meeting meeting;
+
+  MeetingPlannerData({this.meeting, this.update = false});
 }

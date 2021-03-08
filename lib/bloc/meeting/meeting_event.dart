@@ -9,4 +9,10 @@ class CreateMeeting extends MeetingEvent {
   CreateMeeting({this.meeting});
 }
 
+class UpdateMeeting extends MeetingEvent {
+  final Meeting meeting;
+
+  UpdateMeeting({this.meeting});
+}
+
 class LoadMeeting extends MeetingEvent {}

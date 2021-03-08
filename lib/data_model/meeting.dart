@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:intl/intl.dart';
+import 'package:meeting_app/data_model/common.dart';
 
 Meeting meetingFromJson(String str) => Meeting.fromJson(json.decode(str));
 
@@ -30,6 +31,10 @@ class Meeting {
   int roomId;
   int priority;
   int reminder;
+
+  CommonData get room => CommonData(name: roomName, id: roomId);
+
+  CommonData get priorityData => CommonData(name: priorityName(), id: priority);
 
   String priorityName() {
     switch (priority) {

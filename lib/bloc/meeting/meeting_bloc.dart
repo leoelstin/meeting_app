@@ -21,11 +21,15 @@ class MeetingBloc extends Bloc<MeetingEvent, MeetingState> {
       await _repository.createTodo(event?.meeting);
       add(LoadMeeting());
     }
+
+    if (event is UpdateMeeting) {
+      await _repository.updateMeeting(event?.meeting);
+      add(LoadMeeting());
+    }
     if (event is LoadMeeting) {
       List<Meeting> meetings = await _repository.getAllMeetings();
       // meetings.sort((a, b) => a?.priority?.compareTo(b?.priority));
       yield MeetingsLoaded(meetings);
-      yield UpdateMeeting(null);
     }
   }
 }
