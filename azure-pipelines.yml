@@ -37,28 +37,39 @@ jobs:
             Write-Host "##vso[task.prependpath]$(FlutterToolPath)"
             Write-Host "##vso[task.prependpath]$(FlutterToolPath)/cache/dart-sdk/bin"
 
-      - task: PowerShell@2
-        displayName: Setup variables (beta)
-        condition: startsWith(variables['Build.SourceBranch'], 'refs/heads/')
-        inputs:
-          targetType: 'inline'
-          script: |
-            $buildName = "$(Build.SourceVersion)".SubString(0,7)
-            $distributionGroup = "2fee635b-a2d8-4188-b6c3-6addea85d9c1"
-            Write-Host "##vso[task.setvariable variable=BuildName;]$buildName"
-            Write-Host "##vso[task.setvariable variable=DistributionGroup;]$distributionGroup"
+      # - task: PowerShell@2
+      #   displayName: Setup variables (beta)
+      #   condition: startsWith(variables['Build.SourceBranch'], 'refs/heads/')
+      #   inputs:
+      #     targetType: 'inline'
+      #     script: |
+      #       $buildName = "$(Build.SourceVersion)".SubString(0,7)
+      #       $distributionGroup = "2fee635b-a2d8-4188-b6c3-6addea85d9c1"
+      #       Write-Host "##vso[task.setvariable variable=BuildName;]$buildName"
+      #       Write-Host "##vso[task.setvariable variable=DistributionGroup;]$distributionGroup"
 
-      - task: PowerShell@2
-        displayName: Setup variables (public)
-        condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/')
+      # - task: PowerShell@2
+      #   displayName: Setup variables (public)
+      #   condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/')
+      #   inputs:
+      #     targetType: 'inline'
+      #     script: |
+      #       $buildName = "$(Build.SourceBranch)".SubString(11)
+      #       $distributionGroup = "2fee635b-a2d8-4188-b6c3-6addea85d9c1"
+      #       Write-Host "##vso[task.setvariable variable=BuildName;]$buildName"
+      #       Write-Host "##vso[task.setvariable variable=DistributionGroup;]$distributionGroup"
+      
+      - task: AppCenterDistribute@3
         inputs:
-          targetType: 'inline'
-          script: |
-            $buildName = "$(Build.SourceBranch)".SubString(11)
-            $distributionGroup = "2fee635b-a2d8-4188-b6c3-6addea85d9c1"
-            Write-Host "##vso[task.setvariable variable=BuildName;]$buildName"
-            Write-Host "##vso[task.setvariable variable=DistributionGroup;]$distributionGroup"
-
+          serverEndpoint: 'App Center'
+          appSlug: 'Leo-elstin/meeting'
+          appFile: '$(ProjectDirectory)/build/app/outputs/apk/release/app-release.apk'
+          buildVersion: '1'
+          symbolsOption: 'Android'
+          releaseNotesOption: 'input'
+          releaseNotesInput: 'test'
+          destinationType: 'groups'
+          distributionGroupId: '2fee635b-a2d8-4188-b6c3-6addea85d9c1'
       - task: CmdLine@2
         displayName: Run install
         inputs:
