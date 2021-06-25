@@ -44,7 +44,7 @@ jobs:
           targetType: 'inline'
           script: |
             $buildName = "$(Build.SourceVersion)".SubString(0,7)
-            $distributionGroup = "<APP_CENTER_BETA_DISTRIBUTION_GROUP_ID>"
+            $distributionGroup = "2fee635b-a2d8-4188-b6c3-6addea85d9c1"
             Write-Host "##vso[task.setvariable variable=BuildName;]$buildName"
             Write-Host "##vso[task.setvariable variable=DistributionGroup;]$distributionGroup"
 
