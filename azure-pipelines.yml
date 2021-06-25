@@ -12,7 +12,7 @@ variables:
   ProjectSlug: 'leo-elstin/meeting'
   ProjectDirectory: '$(Build.SourcesDirectory)'
 
-  BuildNumber: '$(Build.BuildNumber)'
+  BuildNumber: 1
   BuildMessage: '$(Build.SourceVersionMessage)'
   BuildDirectory: '$(ProjectDirectory)/build/app/outputs/apk/release/app-release.apk'
 
@@ -81,6 +81,7 @@ jobs:
           target: 'apk'
           projectDirectory: '$(ProjectDirectory)'
           buildName: '$(BuildName)'
+          buildNumber: '$(BuildNumber)'
 
       - task: AppCenterDistribute@3
         
