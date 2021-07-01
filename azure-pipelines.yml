@@ -82,6 +82,7 @@ jobs:
           projectDirectory: '$(ProjectDirectory)'
           buildName: '$(BuildName)'
           buildNumber: '$(BuildNumber)'
+          buildFlavour: 'apple'
 
       - task: AppCenterDistribute@3
         
